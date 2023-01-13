@@ -62,3 +62,72 @@ sales2019<- sales2019 %>% mutate(
 )
 ```
 
+### Processing Review Data 
+***First we will look at the unique reviews***
+```{r}
+unique(sales2019[["user_submitted_review"]])
+```
+The positive reviews contain "Never", "Awesome", and "learned". 
+
+```{r}
+is_positive_function<- function(review) {
+  review_positive = case_when(
+    str_detect(review, "Awesome") ~ TRUE, 
+    str_detect(review, "Never") ~ TRUE, 
+    str_detect(review, "learned") ~ TRUE, 
+    TRUE ~ FALSE
+  )
+}
+sales2019<- sales2019 %>% 
+  mutate(
+  is_positive2 = unlist(map(user_submitted_review, is_positive_function))
+)
+```
+
+### Comparing Pre/Post Program Data
+
+***First, convert the date to the proper format, and add a pre/post column***
+
+```{r}
+sales2019<- sales2019 %>% mutate(
+  date_status= if_else(mdy(date) < ymd("2019-07-01"), "PRE", "POST"
+)
+)
+```
+
+***The create a summary table***
+
+```{r}
+pre_post_summary<- sales2019 %>% group_by(date_status) %>% summarize(
+  books_purchased = sum(new_total_purchased)
+)
+pre_post_summary
+
+```
+We can see from the newly created summary table that the program did not increase sales.
+
+Next we can look at if certain titles increased sales more. 
+```{r}
+sales2019 %>% group_by(date_status, title) %>% summarize(
+  books_purchased = sum(new_total_purchased)
+) %>%
+arrange(title, date_status)
+```
+Next we can compare by customer type.  
+```{r}
+pre_post_summary_customer<- sales2019 %>% group_by(date_status, customer_type) %>% summarize(
+  books_purchased = sum(new_total_purchased)
+) %>%
+  arrange(customer_type, date_status)
+pre_post_summary_customer
+```
+Through this analysis we can see that sales incrased within the Business customer type, but decreased in the Individual customer type.   
+
+Now we will compare review sentiment pre and post program.
+```{r}
+pre_post_summary_review<- sales2019 %>% group_by(date_status, is_positive2) %>% summarize(
+  books_purchased = sum(new_total_purchased)
+) %>% arrange(is_positive2, date_status)
+pre_post_summary_review
+```
+After the program there were more positive reviews and fewer negative reviews. 
