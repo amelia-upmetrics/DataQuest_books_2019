@@ -37,3 +37,28 @@ for(c in col_names){
 
 The columns are: Date (character), user_submitted_review (character), title (character), total_purchased (double), and customer_type (character). 
 The columns with missing values are: user_submitted_review and total_purchased.   
+
+### Cleaning the Data 
+
+*** First we will remove any rows with missing data in "user_submitted_review". 
+```{r}
+sales2019<- sales2019 %>% filter(!is.na(sales2019[["user_submitted_review"]]))
+dim(sales2019)
+5000-4115
+```
+885 rows were removed due to missing reviews. 
+
+***Next we will replace any missing data in total_purchased with an average of the column***
+```{r}
+average_purchase<- sales2019 %>% filter(!is.na(sales2019[["total_purchased"]])) %>% pull(total_purchased) %>% mean
+average_purchase
+```
+
+The average purchase is 3.99, so we will use that for any missing values, rounded up to 4.  
+
+```{r}
+sales2019<- sales2019 %>% mutate(
+  new_total_purchased = if_else(is.na(total_purchased), 4, total_purchased)
+)
+```
+
