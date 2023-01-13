@@ -1,0 +1,39 @@
+---
+title: "Book Sales 2019"
+author: "Amelia Rudberg"
+date: "2023-01-13"
+output: html_document
+---
+
+### Prepping the Data 
+***Start by loading the tidyverse package***
+```{r, message=FALSE}
+library(tidyverse)
+```
+
+***Then, load the CSV***
+```{r}
+sales2019<-read_csv("sales2019.csv")
+```
+***Next, describe the column names and types***
+```{r}
+col_names<-colnames(sales2019)
+col_names
+for(c in col_names){
+  print("Column Name:")
+  print(c)
+  print("Column Type:")
+  print(typeof(sales2019[[c]]))
+  print("")
+}
+for(c in col_names){
+  print("Column Name:")
+  print(c)
+  print("Unique Values:")
+  print(unique(sales2019[[c]]))
+  print("-----")
+}
+```
+
+The columns are: Date (character), user_submitted_review (character), title (character), total_purchased (double), and customer_type (character). 
+The columns with missing values are: user_submitted_review and total_purchased.   
